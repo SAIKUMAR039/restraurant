@@ -1,9 +1,9 @@
-
 import type {Metadata} from 'next';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
 import Navigation from '@/components/navigation';
 import {Toaster} from '@/components/ui/toaster';
+import Link from 'next/link';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -69,8 +69,14 @@ export default function RootLayout({
         <Navigation />
         {children}
         <Toaster />
+          <footer className="bg-secondary p-4 text-center">
+            <div className="container mx-auto">
+              <Link href="/admin/login" className="hover:text-primary">
+                Admin Login
+              </Link>
+            </div>
+          </footer>
       </body>
     </html>
   );
 }
-

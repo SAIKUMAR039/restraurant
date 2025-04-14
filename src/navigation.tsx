@@ -19,11 +19,9 @@ export default function Navigation() {
           <Link href="/reservations/add" className="hover:text-primary">
             Add Reservation
           </Link>
-          {/* TODO: Conditionally render based on user login status */}
           <Link href="/login" className="hover:text-primary">
-            Login
+            Login / Signup
           </Link>
-          {/* TODO: Display user information here */}
         </div>
       </div>
     </nav>
