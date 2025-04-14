@@ -22,6 +22,10 @@ public class ReservationService {
         return reservationRepository.findById(id);
     }
 
+    public List<Reservation> getReservationsByUserId(Integer userID) {
+        return reservationRepository.findByUserID(userID);
+    }
+
     public Reservation saveReservation(Reservation reservation) {
         return reservationRepository.save(reservation);
     }
@@ -30,5 +34,3 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 }
-
-    

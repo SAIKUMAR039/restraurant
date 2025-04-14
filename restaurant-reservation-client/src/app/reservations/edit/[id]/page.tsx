@@ -7,6 +7,7 @@ import {Label} from '@/components/ui/label';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useRouter, useParams} from 'next/navigation';
 import {useToast} from '@/hooks/use-toast';
+import {useSession} from 'next-auth/react';
 import axios from 'axios';
 import {format} from 'date-fns';
 
@@ -23,6 +24,7 @@ export default function EditReservationPage() {
   const params = useParams();
   const reservationId = params.id as string;
   const {toast} = useToast();
+  const {data: session} = useSession();
 
   const [customerName, setCustomerName] = useState('');
   const [date, setDate] = useState('');
@@ -54,7 +56,15 @@ export default function EditReservationPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Basic form validation
+    if (!session) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to edit a reservation.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!customerName || !date || !timeSlot || !tableNumber) {
       toast({
         title: 'Error',
@@ -74,6 +84,7 @@ export default function EditReservationPage() {
         reservationDate: formattedDate,
         timeSlot: timeSlot,
         tableNumber: parseInt(tableNumber, 10),
+        userID: session.user.id,
       });
 
       if (response.status === 200) {
@@ -153,5 +164,3 @@ export default function EditReservationPage() {
     </div>
   );
 }
-
-    

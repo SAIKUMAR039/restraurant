@@ -30,6 +30,12 @@ public class ReservationController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/user/{userID}")
+    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable Integer userID) {
+        List<Reservation> reservations = reservationService.getReservationsByUserId(userID);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
         return new ResponseEntity<>(reservationService.saveReservation(reservation), HttpStatus.CREATED);
@@ -53,5 +59,3 @@ public class ReservationController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-
-    

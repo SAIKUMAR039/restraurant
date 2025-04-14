@@ -8,12 +8,14 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {useRouter} from 'next/navigation';
 import {useToast} from '@/hooks/use-toast';
 import {optimizeTableArrangements} from '@/ai/flows/optimize-table-arrangements';
-import axios from 'axios';
+import {useSession} from 'next-auth/react';
 import {format} from 'date-fns';
+import axios from 'axios';
 
 export default function AddReservationPage() {
   const router = useRouter();
   const {toast} = useToast();
+  const {data: session} = useSession();
 
   const [customerName, setCustomerName] = useState('');
   const [date, setDate] = useState('');
@@ -24,7 +26,15 @@ export default function AddReservationPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Basic form validation
+    if (!session) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to create a reservation.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!customerName || !date || !timeSlot || !tableNumber) {
       toast({
         title: 'Error',
@@ -35,17 +45,15 @@ export default function AddReservationPage() {
     }
 
     try {
-      // Convert date string to Date object
       const reservationDate = new Date(date);
-
-      // Format the date as 'yyyy-MM-dd'
       const formattedDate = format(reservationDate, 'yyyy-MM-dd');
 
       const response = await axios.post('http://localhost:8080/reservations', {
         customerName: customerName,
-        reservationDate: formattedDate, // Send the formatted date
+        reservationDate: formattedDate,
         timeSlot: timeSlot,
         tableNumber: parseInt(tableNumber, 10),
+        userID: session.user.id,
       });
 
       if (response.status === 201) {
@@ -53,7 +61,7 @@ export default function AddReservationPage() {
           title: 'Success',
           description: 'Reservation created successfully!',
         });
-        router.push('/reservations'); // Redirect to dashboard after submission
+        router.push('/reservations');
       } else {
         toast({
           title: 'Error',
@@ -160,5 +168,3 @@ export default function AddReservationPage() {
     </div>
   );
 }
-
-    

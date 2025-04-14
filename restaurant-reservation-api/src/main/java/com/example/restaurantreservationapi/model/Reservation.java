@@ -32,6 +32,8 @@ public class Reservation {
 
     @NotNull(message = "Table number cannot be null")
     private Integer tableNumber;
-}
 
-    
+    @NotNull(message = "User ID cannot be null")
+    private Integer userID;
+
+}

@@ -16,6 +16,7 @@ import {useRouter} from 'next/navigation';
 import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from '@/components/ui/alert-dialog';
 import axios from 'axios';
 import {format} from 'date-fns';
+import {useSession} from 'next-auth/react';
 
 interface Reservation {
   reservationID: number;
@@ -28,14 +29,20 @@ interface Reservation {
 export default function ReservationsDashboard() {
   const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const {data: session} = useSession();
 
   useEffect(() => {
     fetchReservations();
-  }, []);
+  }, [session]);
 
   const fetchReservations = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/reservations');
+      if (!session) {
+        console.log('No session found.');
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:8080/reservations`);
       setReservations(response.data);
     } catch (error) {
       console.error('Error fetching reservations:', error);
@@ -50,6 +57,15 @@ export default function ReservationsDashboard() {
       console.error('Error deleting reservation:', error);
     }
   };
+
+  if (!session) {
+    return (
+      <div className="container mx-auto py-10">
+        <h1 className="text-2xl font-bold">Reservation Dashboard</h1>
+        <p>Please log in to view your reservations.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -115,5 +131,3 @@ export default function ReservationsDashboard() {
     </div>
   );
 }
-
-    
