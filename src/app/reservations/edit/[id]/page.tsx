@@ -1,13 +1,12 @@
-
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {useRouter} from 'next/navigation';
-import {useParams} from 'next/navigation';
+import {useRouter, useParams} from 'next/navigation';
+import {useToast} from '@/hooks/use-toast';
 
 interface Reservation {
   id: string;
@@ -17,24 +16,51 @@ interface Reservation {
   tableNumber: number;
 }
 
-const DUMMY_RESERVATION: Reservation =   {
-    id: '1',
-    customerName: 'John Doe',
-    date: '2024-08-15',
-    timeSlot: '19:00',
-    tableNumber: 5,
-  };
-
+const DUMMY_RESERVATION: Reservation = {
+  id: '1',
+  customerName: 'John Doe',
+  date: '2024-08-15',
+  timeSlot: '19:00',
+  tableNumber: 5,
+};
 
 export default function EditReservationPage() {
   const router = useRouter();
-    const params = useParams();
-    const reservationId = params.id;
+  const params = useParams();
+  const reservationId = params.id;
+  const {toast} = useToast();
+
+  const [customerName, setCustomerName] = useState(DUMMY_RESERVATION.customerName);
+  const [date, setDate] = useState(DUMMY_RESERVATION.date);
+  const [timeSlot, setTimeSlot] = useState(DUMMY_RESERVATION.timeSlot);
+  const [tableNumber, setTableNumber] = useState(DUMMY_RESERVATION.tableNumber.toString());
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle form submission logic here
-    alert('Form submitted!');
+
+    // Basic form validation
+    if (!customerName || !date || !timeSlot || !tableNumber) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all fields.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // TODO: Integrate with database to update the reservation
+    console.log('Form data:', {
+      id: reservationId,
+      customerName,
+      date,
+      timeSlot,
+      tableNumber,
+    });
+
+    toast({
+      title: 'Success',
+      description: 'Reservation updated successfully!',
+    });
     router.push('/'); // Redirect to dashboard after submission
   };
 
@@ -53,7 +79,8 @@ export default function EditReservationPage() {
                 id="customerName"
                 placeholder="Enter customer name"
                 type="text"
-                defaultValue={DUMMY_RESERVATION.customerName}
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -61,7 +88,8 @@ export default function EditReservationPage() {
               <Input
                 id="date"
                 type="date"
-                defaultValue={DUMMY_RESERVATION.date}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -69,7 +97,8 @@ export default function EditReservationPage() {
               <Input
                 id="timeSlot"
                 type="time"
-                defaultValue={DUMMY_RESERVATION.timeSlot}
+                value={timeSlot}
+                onChange={(e) => setTimeSlot(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -78,7 +107,8 @@ export default function EditReservationPage() {
                 id="tableNumber"
                 placeholder="Enter table number"
                 type="number"
-                defaultValue={DUMMY_RESERVATION.tableNumber}
+                value={tableNumber}
+                onChange={(e) => setTableNumber(e.target.value)}
               />
             </div>
             <Button type="submit">Update Reservation</Button>
