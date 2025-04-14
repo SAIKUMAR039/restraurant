@@ -17,6 +17,7 @@ import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, A
 import axios from 'axios';
 import {format} from 'date-fns';
 import {useSession} from 'next-auth/react';
+import {useToast} from '@/hooks/use-toast';
 
 interface Reservation {
   reservationID: number;
@@ -30,6 +31,7 @@ export default function ReservationsDashboard() {
   const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const {data: session} = useSession();
+  const {toast} = useToast();
 
   useEffect(() => {
     fetchReservations();
@@ -42,10 +44,15 @@ export default function ReservationsDashboard() {
         return;
       }
 
-      const response = await axios.get(`http://localhost:8080/reservations`);
+      const response = await axios.get(`http://localhost:8080/reservations/user/${session.user.id}`);
       setReservations(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching reservations:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to fetch reservations.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -53,8 +60,17 @@ export default function ReservationsDashboard() {
     try {
       await axios.delete(`http://localhost:8080/reservations/${id}`);
       fetchReservations(); // Refresh the reservation list
-    } catch (error) {
+      toast({
+        title: 'Success',
+        description: 'Reservation deleted successfully!',
+      });
+    } catch (error: any) {
       console.error('Error deleting reservation:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to delete reservation.',
+        variant: 'destructive',
+      });
     }
   };
 
